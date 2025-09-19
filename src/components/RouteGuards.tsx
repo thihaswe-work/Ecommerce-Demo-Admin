@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuthStore } from "../store/auth";
+import { useAuthStore } from "@/store/auth";
 
 // Protected
 export const PrivateRoute = () => {

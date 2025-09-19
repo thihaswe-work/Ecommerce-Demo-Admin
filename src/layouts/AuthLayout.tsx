@@ -1,18 +1,20 @@
 import { Outlet } from "react-router-dom";
-import Navbar from "../components/NavBar";
-import Sidebar from "../components/SideBar";
+import Navbar from "@/components/NavBar";
+import { AppSidebar } from "@/components/SideBar";
 
 export default function AuthLayout() {
   return (
-    <div className="flex flex-col h-screen">
-      {/* Top Navbar */}
-      <Navbar />
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <Sidebar />
-        {/* Main Content */}
-        <main className="flex-1 p-4">
-          <Outlet />
+    <div className="flex h-screen w-full">
+      {/* Sidebar */}
+      <AppSidebar />
+
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Navbar */}
+        <Navbar /> {/* SidebarTrigger is already inside Navbar */}
+        {/* Page content */}
+        <main className="flex-1 p-4 overflow-auto">
+          <Outlet /> {/* Protected pages render here */}
         </main>
       </div>
     </div>

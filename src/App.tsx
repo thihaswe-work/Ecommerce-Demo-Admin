@@ -7,6 +7,7 @@ import DashboardPage from "./pages/dashboard";
 import UsersPage from "./pages/users";
 import OrdersPage from "./pages/orders";
 import ProductsPage from "./pages/products";
+import { SidebarProvider } from "./components/ui/sidebar";
 
 function App() {
   return (
@@ -26,7 +27,13 @@ function App() {
 
         {/* Protected */}
         <Route element={<PrivateRoute />}>
-          <Route element={<AuthLayout />}>
+          <Route
+            element={
+              <SidebarProvider>
+                <AuthLayout />
+              </SidebarProvider>
+            }
+          >
             <Route path="" element={<DashboardPage />} />
             <Route path="products" element={<ProductsPage />} />
             <Route path="users" element={<UsersPage />} />

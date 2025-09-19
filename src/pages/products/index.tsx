@@ -1,66 +1,90 @@
-import { useApi } from "../../hooks/useApi";
+"use client";
 
-export interface Product {
+import { useApi } from "@/hooks/useApi";
+import { DataTable } from "@/components/DataTable";
+import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
+import type { ColumnDef } from "@tanstack/react-table";
+
+interface Product {
   id: string;
   name: string;
-  description?: string;
+  category: string;
   price: number;
-  image?: string;
-  createdAt: string;
-  updatedAt: string;
+  stock: number;
 }
 
-const ProductsPage = () => {
+export default function ProductsPage() {
   const {
     data: products,
     loading,
-    removeItem: deleteProduct,
+    removeItem,
   } = useApi<Product>({
     endpoint: "/products",
   });
 
+  // Define table columns
+  const columns: ColumnDef<Product>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      accessorKey: "category",
+      header: "Category",
+    },
+    {
+      accessorKey: "price",
+      header: "Price",
+      cell: ({ row }) => {
+        const price = row.getValue("price") as number;
+        return (
+          <div className="text-right font-medium">
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(price)}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "stock",
+      header: "Stock",
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <div className="flex gap-2 justify-end">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => console.log("Edit", product.id)}
+            >
+              <Pencil className="w-4 h-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="destructive"
+              onClick={() => removeItem(product.id)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Users</h1>
-      <table className="w-full border">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Image</th>
-            <th>Created At</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((u) => (
-            <tr key={u.id} className="text-center">
-              <td>{u.name}</td>
-              <td>{u.description}</td>
-              <td>
-                {u.image ? (
-                  <img src={u.image} className="w-10 h-10 rounded" />
-                ) : (
-                  "N/A"
-                )}
-              </td>
-              <td>{new Date(u.createdAt).toLocaleString()}</td>
-              <td>
-                <button
-                  onClick={() => deleteProduct(u.id)}
-                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Products</h1>
+      <DataTable columns={columns} data={products} />
     </div>
   );
-};
-
-export default ProductsPage;
+}

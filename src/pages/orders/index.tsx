@@ -1,4 +1,13 @@
-import { useApi } from "../../hooks/useApi";
+import { useApi } from "@/hooks/useApi";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 export interface Order {
   productId: string;
@@ -9,51 +18,64 @@ export interface Order {
 }
 
 const OrdersPage = () => {
-  const { data: orders, loading } = useApi<Order>({
-    endpoint: "/orders",
-  });
+  const { data: orders, loading } = useApi<Order>({ endpoint: "/orders" });
 
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Users</h1>
-      <table className="w-full border">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((u) => (
-            <tr key={u.productId} className="text-center">
-              <td>{u.productName}</td>
-              <td>{u.productId}</td>
-              <td>
-                {u.productImage ? (
-                  <img src={u.productImage} className="w-10 h-10 rounded" />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Orders</h1>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Id</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Image</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Quantity</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {orders.map((order) => (
+            <TableRow key={order.productId}>
+              <TableCell>{order.productId}</TableCell>
+              <TableCell>{order.productName}</TableCell>
+              <TableCell>
+                {order.productImage ? (
+                  <img
+                    src={order.productImage}
+                    alt={order.productName}
+                    className="w-10 h-10 rounded mx-auto"
+                  />
                 ) : (
                   "N/A"
                 )}
-              </td>
-              <td>{new Date(u.price).toLocaleString()}</td>
-              <td>
-                <button
-                  onClick={() => console.log(u.productId)}
-                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+              </TableCell>
+              <TableCell>${order.price.toLocaleString()}</TableCell>
+              <TableCell>{order.quantity}</TableCell>
+              <TableCell>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => console.log("Delete", order.productId)}
                 >
                   Delete
-                </button>
-              </td>
-            </tr>
+                </Button>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+
+          {orders.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center text-gray-500">
+                No orders found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };

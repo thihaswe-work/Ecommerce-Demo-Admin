@@ -1,4 +1,4 @@
-import { useAuthStore } from "../../store/auth";
+import { useAuthStore } from "@/store/auth";
 
 const DashboardPage = () => {
   const logout = useAuthStore((state) => state.logout);
