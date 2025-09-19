@@ -29,7 +29,7 @@ export const useApi = <T>({
 
   const removeItem = useCallback(
     async (id: string) => {
-      if (!confirm("Are you sure?")) return;
+      // if (!confirm("Are you sure?")) return;
       try {
         await apiClient.delete(`${endpoint}/${id}`);
         setData((prev) => prev.filter((item: any) => item.id !== id));
