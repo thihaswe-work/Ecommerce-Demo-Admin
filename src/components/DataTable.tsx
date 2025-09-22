@@ -55,7 +55,14 @@ export function DataTable<T>({ data, columns }: DataTableProps<T>) {
 
   const table = useReactTable({
     data,
-    columns,
+    columns: [
+      {
+        id: "number",
+        header: "No",
+        cell: ({ row }) => row.index + 1,
+      },
+      ...columns,
+    ],
     state: {
       sorting,
       columnFilters,
@@ -150,11 +157,11 @@ export function DataTable<T>({ data, columns }: DataTableProps<T>) {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-2">
-        <div className="text-muted-foreground text-sm">
+      <div className="flex items-center justify-end px-2">
+        {/* <div className="text-muted-foreground text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
+        </div> */}
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"

@@ -81,58 +81,144 @@
 // };
 
 // export default OrdersPage;
-import { useState } from "react";
-import { useApi } from "@/hooks/useApi";
+import { ConfirmDialog } from "@/components/ConfirmationDialog";
 import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
-import { EntityForm } from "@/components/EntityForm";
-import { ConfirmDialog } from "@/components/ConfirmationDialog";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { useApi } from "@/hooks/useApi";
 import type { ColumnDef } from "@tanstack/react-table";
+import { ListChevronsDownUp, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
-interface Order {
-  id: string;
+export interface OrderItem {
+  id: number;
+  productId: number;
+  productName: string;
+  quantity: number;
+  price: number;
+  order: Order;
+}
+
+export interface Order {
+  id: number;
   userId: string;
-  total: number;
-  status: string;
+  items: OrderItem[];
+  totalAmount: number;
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export default function OrdersPage() {
   const { data, loading, removeItem, createItem, updateItem } = useApi<Order>({
     endpoint: "/orders",
   });
-
-  const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Order | null>(null);
+  const navigate = useNavigate();
+  // const [formOpen, setFormOpen] = useState(false);
+  // const [editing, setEditing] = useState<Order | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
+
+  type OrderStatus =
+    | "pending"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "cancelled";
+
+  // Status options array typed
+  const statusOptions: OrderStatus[] = [
+    "pending",
+    "processing",
+    "shipped",
+    "delivered",
+    "cancelled",
+  ];
+
+  const statusColors: Record<string, string> = {
+    pending: "bg-yellow-100 text-yellow-800",
+    processing: "bg-blue-100 text-blue-800",
+    shipped: "bg-purple-100 text-purple-800",
+    delivered: "bg-green-100 text-green-800",
+    cancelled: "bg-red-100 text-red-800",
+  };
 
   const columns: ColumnDef<Order>[] = [
     { accessorKey: "userId", header: "User ID" },
     {
-      accessorKey: "total",
+      accessorKey: "totalAmount",
       header: "Total",
       cell: ({ row }) => (
-        <div className="text-right font-medium">${row.getValue("total")}</div>
+        <div className=" font-medium">
+          ${(row.getValue("totalAmount") as number).toFixed(2)}
+        </div>
       ),
     },
-    { accessorKey: "status", header: "Status" },
+
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const order = row.original;
+        const status = row.getValue("status") as string;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={`flex items-center gap-1  
+                  hover:${statusColors[status]} ${statusColors[status]}`}
+              >
+                <span className={`px-2 py-1 rounded text-xs font-medium w-18`}>
+                  {order.status}
+                </span>
+                <ChevronDown className="w-3 h-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {statusOptions.map((status) => (
+                <DropdownMenuItem
+                  key={status}
+                  onClick={async () => {
+                    // TODO: call your API to update status
+                    await updateItem(order.id, { status });
+                  }}
+                >
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${statusColors[status]}`}
+                  >
+                    {status}
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
     {
       id: "actions",
-      header: "Actions",
       cell: ({ row }) => {
         const order = row.original;
         return (
           <div className="flex gap-2 justify-end">
+            {/* 👁 View Details */}
             <Button
               size="icon"
               variant="outline"
-              onClick={() => {
-                setEditing(order);
-                setFormOpen(true);
-              }}
+              onClick={() => navigate(`/orders/${order.id}`)}
             >
-              <Pencil className="w-4 h-4" />
+              <ListChevronsDownUp className="w-4 h-4" />
             </Button>
+
+            {/* 🗑 Delete */}
             <Button
               size="icon"
               variant="destructive"
@@ -152,37 +238,9 @@ export default function OrdersPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Orders</h1>
-        <Button onClick={() => setFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Create Order
-        </Button>
       </div>
 
       <DataTable columns={columns} data={data} />
-
-      {/* Form */}
-      <EntityForm<Order>
-        open={formOpen}
-        title={editing ? "Edit Order" : "Create Order"}
-        fields={[
-          { name: "userId", label: "User ID" },
-          { name: "total", label: "Total", type: "number" },
-          { name: "status", label: "Status" },
-        ]}
-        initialData={editing}
-        onClose={() => {
-          setFormOpen(false);
-          setEditing(null);
-        }}
-        onSubmit={async (values) => {
-          if (editing) {
-            await updateItem(editing.id, values);
-          } else {
-            await createItem(values);
-          }
-          setFormOpen(false);
-          setEditing(null);
-        }}
-      />
 
       {/* Delete */}
       <ConfirmDialog

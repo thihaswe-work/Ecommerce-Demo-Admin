@@ -8,6 +8,7 @@ import UsersPage from "./pages/users";
 import OrdersPage from "./pages/orders";
 import ProductsPage from "./pages/products";
 import { SidebarProvider } from "./components/ui/sidebar";
+import OrderDetailPage from "./pages/orders/orderDetail";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="products" element={<ProductsPage />} />
             <Route path="users" element={<UsersPage />} />
             <Route path="orders" element={<OrdersPage />} />
+            <Route path="orders/:id" element={<OrderDetailPage />} />
             {/* <Route path="payments" element={<PaymentsPage />} /> */}
             {/* <Route path="profile" element={<ProfilePage />} /> */}
           </Route>

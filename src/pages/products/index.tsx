@@ -4,6 +4,7 @@ import { ConfirmDialog } from "@/components/ConfirmationDialog";
 import { DataTable } from "@/components/DataTable";
 import { EntityForm } from "@/components/EntityForm";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useApi } from "@/hooks/useApi";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CopyIcon, Pencil, Plus, Trash2 } from "lucide-react";
@@ -11,7 +12,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
   image: string;
   description: string;
@@ -29,6 +30,27 @@ export default function ProductsPage() {
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
 
   const columns: ColumnDef<Product>[] = [
+    // {
+    //   id: "select",
+    //   header: ({ table }) => (
+    //     <Checkbox
+    //       checked={
+    //         table.getIsAllPageRowsSelected() ||
+    //         (table.getIsSomePageRowsSelected() && "indeterminate")
+    //       }
+    //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    //       aria-label="Select all"
+    //     />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <Checkbox
+    //       checked={row.getIsSelected()}
+    //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //       aria-label="Select row"
+    //     />
+    //   ),
+    // },
+
     { accessorKey: "name", header: "Name" },
     {
       accessorKey: "image",
@@ -47,7 +69,17 @@ export default function ProductsPage() {
         );
       },
     },
-    { accessorKey: "description", header: "Description" },
+    {
+      accessorKey: "description",
+      header: "Description",
+      cell(props) {
+        return (
+          <div className="line-clamp-2">
+            {props.row.getValue("description")}
+          </div>
+        );
+      },
+    },
     {
       accessorKey: "price",
       header: "Price",

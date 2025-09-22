@@ -28,7 +28,7 @@ export const useApi = <T>({
   }, [endpoint, fetchParams, transform]);
 
   const removeItem = useCallback(
-    async (id: string) => {
+    async (id: string | number) => {
       // if (!confirm("Are you sure?")) return;
       try {
         await apiClient.delete(`${endpoint}/${id}`);
@@ -54,7 +54,7 @@ export const useApi = <T>({
   );
 
   const updateItem = useCallback(
-    async (id: string, payload: Partial<T>) => {
+    async (id: string | number, payload: Partial<T>) => {
       try {
         const res = await apiClient.put(`${endpoint}/${id}`, payload);
         setData((prev) =>
@@ -70,7 +70,14 @@ export const useApi = <T>({
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [endpoint]);
 
-  return { data, loading, fetchData, removeItem, createItem, updateItem };
+  return {
+    data,
+    loading,
+    fetchData,
+    removeItem,
+    createItem,
+    updateItem,
+  };
 };
