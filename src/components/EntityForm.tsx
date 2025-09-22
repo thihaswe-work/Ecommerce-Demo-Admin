@@ -13,6 +13,7 @@ interface Field {
   name: string;
   label: string;
   type?: string; // text, number, etc.
+  required?: boolean; // default false
 }
 
 interface EntityFormProps<T extends object> {
@@ -33,6 +34,7 @@ export function EntityForm<T extends object>({
   onSubmit,
 }: EntityFormProps<T>) {
   const [form, setForm] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (initialData) {
@@ -43,9 +45,22 @@ export function EntityForm<T extends object>({
     } else {
       setForm(Object.fromEntries(fields.map((f) => [f.name, ""])));
     }
+    setErrors({});
   }, [initialData, fields]);
 
   const handleSubmit = () => {
+    const newErrors: Record<string, string> = {};
+    fields.forEach((f) => {
+      if ((f.required ?? false) && !form[f.name]?.trim()) {
+        newErrors[f.name] = `${f.label} is required`;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     const parsed = Object.fromEntries(
       fields.map((f) => [
         f.name,
@@ -62,15 +77,31 @@ export function EntityForm<T extends object>({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          {fields.map((f) => (
-            <Input
-              key={f.name}
-              type={f.type || "text"}
-              placeholder={f.label}
-              value={form[f.name] || ""}
-              onChange={(e) => setForm({ ...form, [f.name]: e.target.value })}
-            />
-          ))}
+          {fields.map((f) => {
+            const isRequired = f.required ?? false;
+            return (
+              <div key={f.name} className="flex flex-col">
+                <Input
+                  type={f.type || "text"}
+                  placeholder={f.label + (isRequired ? " *" : "")}
+                  value={form[f.name] || ""}
+                  onChange={(e) => {
+                    setForm({ ...form, [f.name]: e.target.value });
+                    // remove error on change
+                    if (errors[f.name]) {
+                      setErrors({ ...errors, [f.name]: "" });
+                    }
+                  }}
+                  className={errors[f.name] ? "border-red-500" : ""}
+                />
+                {errors[f.name] && (
+                  <span className="text-red-500 text-sm mt-1">
+                    {errors[f.name]}
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
         <DialogFooter className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>

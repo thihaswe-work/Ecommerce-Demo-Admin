@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { useApi } from "@/hooks/useApi";
-import { DataTable } from "@/components/DataTable";
-import { Button } from "@/components/ui/button";
-import { EntityForm } from "@/components/EntityForm";
 import { ConfirmDialog } from "@/components/ConfirmationDialog";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { DataTable } from "@/components/DataTable";
+import { EntityForm } from "@/components/EntityForm";
+import { Button } from "@/components/ui/button";
+import { useApi } from "@/hooks/useApi";
 import type { ColumnDef } from "@tanstack/react-table";
+import { CopyIcon, Pencil, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface Product {
   id: string;
   name: string;
-  category: string;
+  image: string;
+  description: string;
   price: number;
   stock: number;
 }
@@ -28,12 +30,29 @@ export default function ProductsPage() {
 
   const columns: ColumnDef<Product>[] = [
     { accessorKey: "name", header: "Name" },
-    { accessorKey: "category", header: "Category" },
+    {
+      accessorKey: "image",
+      header: "Image",
+      cell: ({ row }) => {
+        return (
+          <div>
+            <img
+              src={row.getValue("image") as string}
+              alt="product image"
+              width={0}
+              height={0}
+              className="rounded-full w-10 h-10"
+            />
+          </div>
+        );
+      },
+    },
+    { accessorKey: "description", header: "Description" },
     {
       accessorKey: "price",
       header: "Price",
       cell: ({ row }) => (
-        <div className="text-right font-medium">
+        <div className=" font-medium">
           {new Intl.NumberFormat("en-US", {
             style: "currency",
             currency: "USD",
@@ -41,14 +60,23 @@ export default function ProductsPage() {
         </div>
       ),
     },
-    { accessorKey: "stock", header: "Stock" },
     {
       id: "actions",
-      header: "Actions",
+      // header: "Actions",
       cell: ({ row }) => {
         const product = row.original;
         return (
           <div className="flex gap-2 justify-end">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(product.name);
+                toast.success("Product name has been copied");
+              }}
+            >
+              <CopyIcon className="w-4 h-4" />
+            </Button>
             <Button
               size="icon"
               variant="outline"
@@ -90,9 +118,10 @@ export default function ProductsPage() {
         open={formOpen}
         title={editing ? "Edit Product" : "Create Product"}
         fields={[
-          { name: "name", label: "Name" },
-          { name: "category", label: "Category" },
-          { name: "price", label: "Price", type: "number" },
+          { name: "name", label: "Name", required: true },
+          { name: "description", label: "Description", required: true },
+          { name: "price", label: "Price", type: "number", required: true },
+          { name: "image", label: "Image" },
           { name: "stock", label: "Stock", type: "number" },
         ]}
         initialData={editing}
