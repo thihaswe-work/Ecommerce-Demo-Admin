@@ -83,6 +83,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
       await onSubmit(values);
       if (mode !== "reset") navigate("/");
     } catch (err: any) {
+      console.log("error from ", err);
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);

@@ -1,6 +1,6 @@
 // RegisterPage.tsx
 import AuthForm from "@/components/AuthForm";
-import { useAuthStore } from "@/store/auth";
+import { useAuthStore } from "@/store/authStore";
 
 const RegisterPage = () => {
   const register = useAuthStore((state) => state.register);

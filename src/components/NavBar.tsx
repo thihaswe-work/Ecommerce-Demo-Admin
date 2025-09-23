@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { User, LogOut, Menu, Moon, Sun } from "lucide-react"; // Menu icon optional
 import { SidebarTrigger } from "@/components/ui/sidebar"; // import SidebarTrigger
 import { useStore } from "zustand";
-import { useAuthStore } from "@/store/auth";
-import { useThemeStore } from "@/store/theme";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
 
 export default function Navbar() {
   const navigate = useNavigate();

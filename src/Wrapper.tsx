@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import App from "./App";
 import { Toaster } from "sonner";
-import { useThemeStore } from "./store/theme";
+import { useThemeStore } from "./store/themeStore";
 import { ErrorProvider } from "./context/errorContext";
 
 const Wrapper = () => {

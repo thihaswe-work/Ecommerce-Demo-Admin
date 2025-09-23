@@ -48,6 +48,26 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  register: async (email, password, confirmPassword) => {},
-  resetPassword: async (email) => {},
+  register: async (email, password, confirmPassword) => {
+    try {
+      const res = await apiClient.post("/auth/register", {
+        email,
+        password,
+        confirmPassword,
+      });
+      console.log(res.data.user); // user info
+      console.log("cookie", document.cookie);
+      set({ user: res.data.user });
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+    } catch (err: any) {
+      throw new Error(err.response?.data?.message || "Register failed");
+    }
+  },
+  resetPassword: async (email) => {
+    try {
+      const res = await apiClient.post("/auth/reset-password", { email });
+    } catch (err: any) {
+      throw new Error(err.response?.data?.message || "Password Reset failed");
+    }
+  },
 }));
