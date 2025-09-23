@@ -1,11 +1,17 @@
-import { create } from "zustand";
 import { apiClient } from "@/api/client";
+import { create } from "zustand";
 
 interface AuthState {
   user: any | null;
   setUser: (user: any) => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    confirmPassword: string
+  ) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -41,4 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.removeItem("user");
     }
   },
+
+  register: async (email, password, confirmPassword) => {},
+  resetPassword: async (email) => {},
 }));

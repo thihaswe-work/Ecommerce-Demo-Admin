@@ -11,6 +11,6 @@ export const PrivateRoute = () => {
 // Public
 export const PublicRoute = () => {
   const user = useAuthStore((state) => state.user);
-  if (user) return <Navigate to="/dashboard" replace />;
+  if (user) return <Navigate to="/" replace />;
   return <Outlet />;
 };

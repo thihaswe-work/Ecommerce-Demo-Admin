@@ -1,12 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import GlobalErrorHandler from "./components/GlobalErrorHandler";
+import Loader from "./components/Loader";
 import { PrivateRoute, PublicRoute } from "./components/RouteGuards";
 import { SidebarProvider } from "./components/ui/sidebar";
-import GlobalErrorHandler from "./components/GlobalErrorHandler";
 import { useError } from "./context/errorContext";
 import AuthLayout from "./layouts/AuthLayout";
 import PublicLayout from "./layouts/PublicLayout";
-import Loader from "./components/Loader";
+import RegisterPage from "./pages/(auth)/register.tsx";
+import ResetPasswordPage from "./pages/(auth)/reset-password";
 
 // ✅ Lazy imports
 const LoginPage = lazy(() => import("./pages/(auth)/login"));
@@ -36,6 +38,22 @@ function App() {
               element={
                 <PublicLayout>
                   <LoginPage />
+                </PublicLayout>
+              }
+            />
+            <Route
+              path="register"
+              element={
+                <PublicLayout>
+                  <RegisterPage />
+                </PublicLayout>
+              }
+            />
+            <Route
+              path="reset-password"
+              element={
+                <PublicLayout>
+                  <ResetPasswordPage />
                 </PublicLayout>
               }
             />
