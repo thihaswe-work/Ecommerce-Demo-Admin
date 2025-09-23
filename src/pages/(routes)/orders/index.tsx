@@ -86,7 +86,7 @@ import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
 import { useApi } from "@/hooks/useApi";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ListChevronsDownUp, Trash2 } from "lucide-react";
+import { CopyIcon, ListChevronsDownUp, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -96,6 +96,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 
 export interface OrderItem {
   id: number;
@@ -107,7 +108,7 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id: number;
+  id: string;
   userId: string;
   items: OrderItem[];
   totalAmount: number;
@@ -150,6 +151,7 @@ export default function OrdersPage() {
   };
 
   const columns: ColumnDef<Order>[] = [
+    { accessorKey: "id", header: "Order ID" },
     { accessorKey: "userId", header: "User ID" },
     {
       accessorKey: "totalAmount",
@@ -176,7 +178,9 @@ export default function OrdersPage() {
                 className={`flex items-center gap-1  
                   hover:${statusColors[status]} ${statusColors[status]}`}
               >
-                <span className={`px-2 py-1 rounded text-xs font-medium w-18`}>
+                <span
+                  className={`px-2 py-1 rounded text-xs font-medium w-18 hover:${statusColors[status]}`}
+                >
                   {order.status}
                 </span>
                 <ChevronDown className="w-3 h-3" />
@@ -209,6 +213,16 @@ export default function OrdersPage() {
         const order = row.original;
         return (
           <div className="flex gap-2 justify-end">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(order.id);
+                toast.success("OrderId copied to clipboard");
+              }}
+            >
+              <CopyIcon className="w-4 h-4" />
+            </Button>
             {/* 👁 View Details */}
             <Button
               size="icon"
@@ -217,7 +231,6 @@ export default function OrdersPage() {
             >
               <ListChevronsDownUp className="w-4 h-4" />
             </Button>
-
             {/* 🗑 Delete */}
             <Button
               size="icon"

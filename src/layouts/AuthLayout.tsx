@@ -9,7 +9,7 @@ export default function AuthLayout() {
       <AppSidebar />
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 overflow-x-auto flex flex-col">
         {/* Top Navbar */}
         <Navbar /> {/* SidebarTrigger is already inside Navbar */}
         {/* Page content */}

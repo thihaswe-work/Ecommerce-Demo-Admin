@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Home, Inbox, Calendar, Search, Settings } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -10,15 +9,15 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { Home, Users, ShoppingCart, Package, Settings } from "lucide-react";
 
 const items = [
-  { title: "Dashboard", url: "/", icon: Home },
-  { title: "Users", url: "/users", icon: Inbox },
-  { title: "Orders", url: "/orders", icon: Calendar },
-  { title: "Products", url: "/products", icon: Search },
-  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Dashboard", url: "/", icon: Home }, // Home icon → Dashboard
+  { title: "Users", url: "/users", icon: Users }, // Users icon → Users
+  { title: "Orders", url: "/orders", icon: ShoppingCart }, // ShoppingCart → Orders
+  { title: "Products", url: "/products", icon: Package }, // Package → Products
+  { title: "Settings", url: "/settings", icon: Settings }, // Settings → Settings
 ];
-
 export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">

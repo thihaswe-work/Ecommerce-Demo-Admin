@@ -117,7 +117,7 @@ export function DataTable<T>({ data, columns }: DataTableProps<T>) {
 
       {/* Table */}
       <div className="overflow-hidden rounded-md border">
-        <Table>
+        <Table className="">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

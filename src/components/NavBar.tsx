@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { User, LogOut, Menu } from "lucide-react"; // Menu icon optional
+import { User, LogOut, Menu, Moon, Sun } from "lucide-react"; // Menu icon optional
 import { SidebarTrigger } from "@/components/ui/sidebar"; // import SidebarTrigger
 import { useStore } from "zustand";
 import { useAuthStore } from "@/store/auth";
+import { useThemeStore } from "@/store/theme";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -14,13 +15,14 @@ export default function Navbar() {
     // Perform logout logic here (clear token, call API, etc.)
     await logout(); // redirect to login page
   };
+  const { theme, toggleTheme } = useThemeStore();
 
   return (
     <motion.nav
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="bg-white shadow-md px-6 py-4 flex justify-between items-center"
+      className=" bg-white dark:bg-muted shadow-md px-6 py-4 flex justify-between items-center"
     >
       <div className="flex items-center gap-4">
         {/* Sidebar Trigger Button */}
@@ -31,10 +33,19 @@ export default function Navbar() {
         </SidebarTrigger>
 
         {/* App title */}
-        <div className="text-2xl font-bold text-gray-800">Admin Dashboard</div>
+        <div className="text-2xl font-bold light:text-gray-800">
+          Admin Dashboard
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
+        <Button
+          onClick={toggleTheme}
+          className="flex items-center gap-2"
+          aria-label="Toggle theme"
+        >
+          {theme === "light" ? <Moon /> : <Sun />}
+        </Button>
         <Button
           variant="outline"
           size="sm"
@@ -43,12 +54,11 @@ export default function Navbar() {
         >
           <User className="w-4 h-4" /> Profile
         </Button>
-
         <Button
           variant="destructive"
           size="sm"
           onClick={handleLogout}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 dark:bg-red-500"
         >
           <LogOut className="w-4 h-4" /> Logout
         </Button>
