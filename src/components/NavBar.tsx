@@ -16,7 +16,6 @@ export default function Navbar() {
     await logout(); // redirect to login page
   };
   const { theme, toggleTheme } = useThemeStore();
-
   return (
     <motion.nav
       initial={{ y: -50, opacity: 0 }}

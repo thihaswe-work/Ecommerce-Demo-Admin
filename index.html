@@ -13,8 +13,10 @@
         ).matches;
         if (storedTheme === "dark" || (!storedTheme && prefersDark)) {
           document.documentElement.classList.add("dark");
+          // localStorage.setItem("dark");
         } else {
           document.documentElement.classList.remove("dark");
+          // localStorage.setItem("light");
         }
       })();
     </script>

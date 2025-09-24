@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email, password) => {
     try {
       const res = await apiClient.post("/auth/login", { email, password });
-      console.log(res.data.user); // user info
+      console.log(res.data.user);
       console.log("cookie", document.cookie);
       set({ user: res.data.user });
       localStorage.setItem("user", JSON.stringify(res.data.user));
