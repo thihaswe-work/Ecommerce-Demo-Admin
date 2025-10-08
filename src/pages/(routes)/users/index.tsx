@@ -5,18 +5,18 @@ import { DataTable } from "@/components/DataTable";
 import { EntityForm } from "@/components/EntityForm";
 import { Button } from "@/components/ui/button";
 import { useApi } from "@/hooks/useApi";
+import type { User } from "@/types/type";
 import type { ColumnDef } from "@tanstack/react-table";
-import { CopyIcon, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  CopyIcon,
+  ListChevronsDownUp,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  createdAt: Date;
-}
 
 export default function UsersPage() {
   const { data, loading, removeItem, createItem, updateItem } = useApi<User>({
@@ -26,9 +26,19 @@ export default function UsersPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
-
+  const navigate = useNavigate();
   const columns: ColumnDef<User>[] = [
-    { accessorKey: "name", header: "Name" },
+    {
+      header: "Name",
+      cell: ({ row }) => {
+        const user = row.original as User;
+        return (
+          <div>
+            {user.firstName} {user.lastName}
+          </div>
+        );
+      },
+    },
     { accessorKey: "email", header: "Email" },
     {
       accessorKey: "avatar",
@@ -63,7 +73,14 @@ export default function UsersPage() {
             >
               <CopyIcon className="w-4 h-4" />
             </Button>
-
+            {/* 👁 View Details */}
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => navigate(`/users/${user.id}`)}
+            >
+              <ListChevronsDownUp className="w-4 h-4" />
+            </Button>
             <Button
               size="icon"
               variant="destructive"
@@ -116,7 +133,9 @@ export default function UsersPage() {
       <ConfirmDialog
         open={!!deleteTarget}
         title="Delete User"
-        description={`Are you sure you want to delete "${deleteTarget?.name}"?`}
+        description={`Are you sure you want to delete "${
+          (deleteTarget?.firstName, " ", deleteTarget?.lastName)
+        }"?`}
         onCancel={() => setDeleteTarget(null)}
         onConfirm={async () => {
           if (deleteTarget) {

@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import type { Order, OrderItem } from "./index"; // adjust path to your types
 import { useApi } from "@/hooks/useApi";
+import type { Order, OrderItem } from "@/types/type";
 
 const OrderDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +36,7 @@ const OrderDetailPage = () => {
     <div className="p-6 space-y-4">
       <h1 className="text-2xl font-bold">Order #{order.id}</h1>
       <p>
-        <strong>User ID:</strong> {order.userId}
+        <strong>User ID:</strong> {order.customerId}
       </p>
       <p
         className={`${
@@ -46,7 +46,7 @@ const OrderDetailPage = () => {
         <strong>Status:</strong> {order.status}
       </p>
       <p>
-        <strong>Total:</strong> ${order.totalAmount.toFixed(2)}
+        <strong>Total:</strong> ${order.total.toFixed(2)}
       </p>
 
       <h2 className="text-xl font-semibold mt-4">Items</h2>
@@ -60,7 +60,7 @@ const OrderDetailPage = () => {
           </tr>
         </thead>
         <tbody>
-          {order.items.map((item: OrderItem) => (
+          {order.orderItems?.map((item: OrderItem) => (
             <tr key={item.id}>
               <td className="px-2 py-1 border">{item.productName}</td>
               <td className="px-2 py-1 border">${item.price.toFixed(2)}</td>

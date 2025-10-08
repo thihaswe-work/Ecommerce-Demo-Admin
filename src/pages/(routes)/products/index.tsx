@@ -6,19 +6,11 @@ import { EntityForm } from "@/components/EntityForm";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useApi } from "@/hooks/useApi";
+import type { Product } from "@/types/type";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CopyIcon, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-
-interface Product {
-  id: number;
-  name: string;
-  image: string;
-  description: string;
-  price: number;
-  stock: number;
-}
 
 export default function ProductsPage() {
   const { data, loading, removeItem, createItem, updateItem } = useApi<Product>(
@@ -70,27 +62,42 @@ export default function ProductsPage() {
       },
     },
     {
-      accessorKey: "description",
+      accessorKey: "desc",
       header: "Description",
       cell(props) {
+        return <div className="line-clamp-2">{props.row.getValue("desc")}</div>;
+      },
+    },
+    // {
+    //   header: "Price",
+    //   cell: ({ row }) => {
+    //     const product = row.original as Product;
+    //     const price = product.inventory?.price ?? 0;
+    //     return (
+    //       <div className="font-medium">
+    //         {new Intl.NumberFormat("en-US", {
+    //           style: "currency",
+    //           currency: "USD",
+    //         }).format(price)}
+    //       </div>
+    //     );
+    //   },
+    // },
+    {
+      accessorKey: "inventory.price", // points to nested inventory price
+      header: "Price",
+      cell: ({ row }) => {
+        const inventory = row.original.inventory;
+        const price = inventory?.price ?? 0; // fallback if inventory is undefined
         return (
-          <div className="line-clamp-2">
-            {props.row.getValue("description")}
+          <div className="font-medium">
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(price)}
           </div>
         );
       },
-    },
-    {
-      accessorKey: "price",
-      header: "Price",
-      cell: ({ row }) => (
-        <div className=" font-medium">
-          {new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-          }).format(row.getValue("price") as number)}
-        </div>
-      ),
     },
     {
       id: "actions",

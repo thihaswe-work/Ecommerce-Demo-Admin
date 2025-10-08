@@ -97,25 +97,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-
-export interface OrderItem {
-  id: number;
-  productId: number;
-  productName: string;
-  quantity: number;
-  price: number;
-  order: Order;
-}
-
-export interface Order {
-  id: string;
-  userId: string;
-  items: OrderItem[];
-  totalAmount: number;
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { Order } from "@/types/type";
 
 export default function OrdersPage() {
   const { data, loading, removeItem, createItem, updateItem } = useApi<Order>({
@@ -152,13 +134,13 @@ export default function OrdersPage() {
 
   const columns: ColumnDef<Order>[] = [
     { accessorKey: "id", header: "Order ID" },
-    { accessorKey: "userId", header: "User ID" },
+    { accessorKey: "customerId", header: "Customer ID" },
     {
-      accessorKey: "totalAmount",
+      accessorKey: "total",
       header: "Total",
       cell: ({ row }) => (
         <div className=" font-medium">
-          ${(row.getValue("totalAmount") as number).toFixed(2)}
+          ${(row.getValue("total") as number).toFixed(2)}
         </div>
       ),
     },
