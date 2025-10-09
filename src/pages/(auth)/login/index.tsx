@@ -7,12 +7,14 @@ const LoginPage = () => {
   const handleLogin = async ({
     email,
     password,
+    remember,
   }: {
     email: string;
     password?: string;
+    remember?: boolean;
   }) => {
     if (!password) throw new Error("Password is required");
-    await login(email, password);
+    await login(email, password, remember);
   };
 
   return <AuthForm mode="login" onSubmit={handleLogin} />;

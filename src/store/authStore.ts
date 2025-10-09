@@ -1,10 +1,11 @@
 import { apiClient } from "@/api/client";
+import type { User } from "@/types/type";
 import { create } from "zustand";
 
 interface AuthState {
-  user: any | null;
+  user: User | null;
   setUser: (user: any) => void;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, remember: boolean) => Promise<void>;
   logout: () => Promise<void>;
   register: (
     email: string,
@@ -25,14 +26,26 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user });
   },
 
-  login: async (email, password) => {
+  login: async (email, password, remember = false) => {
     try {
-      const res = await apiClient.post("/auth/login", { email, password });
-      console.log(res.data.user);
-      console.log("cookie", document.cookie);
+      const res = await apiClient.post("/auth/login", {
+        email,
+        password,
+        remember,
+      });
+      if (res.data.user.role !== "admin") {
+        await apiClient.post("/auth/logout");
+        throw new Error("Unauthorized User");
+      }
+
+      // console.log(res.data.user.role);
+      // console.log("cookie", document.cookie);
       set({ user: res.data.user });
       localStorage.setItem("user", JSON.stringify(res.data.user));
     } catch (err: any) {
+      if (err.message === "Unauthorized User")
+        throw new Error("Unauthorized User");
+
       throw new Error(err.response?.data?.message || "Login failed");
     }
   },

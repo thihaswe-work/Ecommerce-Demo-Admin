@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { Mail, Lock, Loader2 } from "lucide-react";
+import { Checkbox } from "./ui/checkbox";
 
 type AuthMode = "login" | "register" | "reset";
 
@@ -26,6 +27,7 @@ interface AuthFormProps {
     email: string;
     password?: string;
     confirmPassword?: string;
+    remember?: boolean;
   }) => Promise<void>;
 }
 
@@ -33,7 +35,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
-
   const formSchema = z
     .object({
       email: z.string().email("Invalid email address"),
@@ -45,6 +46,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
         mode === "register"
           ? z.string().min(6, "Confirm password is required")
           : z.string().optional(),
+      remember:
+        mode === "login" ? z.boolean().optional() : z.boolean().optional(), // add remember
     })
     .refine(
       (data) =>
@@ -60,6 +63,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
+      remember: false, // default unchecked
     },
   });
 
@@ -80,10 +85,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
     setLoading(true);
     setError(null);
     try {
-      await onSubmit(values);
+      await onSubmit(values); // values.remember will be true/false
       if (mode !== "reset") navigate("/");
     } catch (err: any) {
-      console.log("error from ", err);
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
@@ -94,13 +98,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
     <div className="flex items-center justify-center min-h-screen bg-background text-foreground">
       <div className="w-full max-w-md bg-card p-8 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold text-center mb-6">{title}</h1>
-
         {error && (
           <p className="text-destructive text-center mb-4 font-medium">
             {error}
           </p>
         )}
-
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
@@ -170,6 +172,27 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
                 )}
               />
             )}
+            {/* Remember Me (Login only) */}
+            {mode === "login" && (
+              <FormField
+                control={form.control}
+                name="remember"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="w-4 h-4 rounded border border-gray-300 text-primary focus:ring-primary"
+                      />
+                    </FormControl>
+                    <FormLabel className="text-sm cursor-pointer">
+                      Remember Me
+                    </FormLabel>
+                  </FormItem>
+                )}
+              />
+            )}
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -177,7 +200,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
             </Button>
           </form>
         </Form>
-
         {/* Footer links */}
         {mode === "login" && (
           <p className="text-center text-muted-foreground text-sm mt-4 space-x-2">
@@ -196,7 +218,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
             </span>
           </p>
         )}
-
         {mode === "register" && (
           <p className="text-center text-muted-foreground text-sm mt-4">
             Already have an account?{" "}
