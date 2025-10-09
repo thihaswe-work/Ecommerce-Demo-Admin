@@ -14,7 +14,7 @@ const LoginPage = () => {
     remember?: boolean;
   }) => {
     if (!password) throw new Error("Password is required");
-    await login(email, password, remember);
+    await login(email, password, remember as boolean);
   };
 
   return <AuthForm mode="login" onSubmit={handleLogin} />;
