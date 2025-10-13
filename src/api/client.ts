@@ -23,7 +23,7 @@ apiClient.interceptors.response.use(
 apiClient.interceptors.request.use((config) => {
   const token = document.cookie
     .split("; ")
-    .find((row) => row.startsWith("token="))
+    .find((row) => row.startsWith("adminToken="))
     ?.split("=")[1];
 
   if (token) {

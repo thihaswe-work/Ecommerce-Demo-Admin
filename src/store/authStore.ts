@@ -38,8 +38,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw new Error("Unauthorized User");
       }
 
-      // console.log(res.data.user.role);
-      // console.log("cookie", document.cookie);
       set({ user: res.data.user });
       localStorage.setItem("user", JSON.stringify(res.data.user));
     } catch (err: any) {
@@ -51,8 +49,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
+    const currentUser = useAuthStore.getState().user;
     try {
-      await apiClient.post("/auth/logout"); // clear cookie on backend
+      await apiClient.post("/auth/logout", { userRole: currentUser?.role }); // clear cookie on backend
     } catch (err) {
       console.error("Logout failed", err);
     } finally {
