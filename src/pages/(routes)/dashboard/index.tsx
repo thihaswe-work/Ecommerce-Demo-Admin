@@ -9,8 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-// Import Recharts for the Bar Chart
 import {
   BarChart,
   Bar,
@@ -19,11 +17,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { stat } from "fs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useThemeStore } from "@/store/themeStore";
 
 const DashboardPage = () => {
   const [sortAsc, setSortAsc] = useState(false);
+  const { theme } = useThemeStore(); // get current theme
+  const isDark = theme === "dark";
 
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
@@ -57,19 +57,11 @@ const DashboardPage = () => {
     });
   });
 
-  // Get top 10 products by quantity sold
   const topProducts = Object.entries(productCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
 
-  // Debugging: log the top products data
-  console.log("Top Products: ", topProducts);
-
-  // Format the data for the chart
-  const chartData = topProducts.map(([name, qty]) => ({
-    name,
-    qty,
-  }));
+  const chartData = topProducts.map(([name, qty]) => ({ name, qty }));
 
   // Top customers
   const customerCounts: Record<string, number> = {};
@@ -88,6 +80,10 @@ const DashboardPage = () => {
     delivered: "bg-green-100 text-green-800",
     cancelled: "bg-red-100 text-red-800",
   };
+
+  // Chart colors based on theme
+  const barColor = isDark ? "#818cf8" : "#4f46e5"; // lighter in dark mode
+  const axisColor = isDark ? "#f3f4f6" : "#111827"; // light for dark mode, dark for light mode
 
   return (
     <div className="p-6 bg-background text-foreground min-h-screen space-y-6">
@@ -142,10 +138,7 @@ const DashboardPage = () => {
               <TableHead>Customer ID</TableHead>
               <TableHead>
                 <button
-                  onClick={() => {
-                    // Toggle sorting between ascending/descending
-                    setSortAsc((prev) => !prev);
-                  }}
+                  onClick={() => setSortAsc((prev) => !prev)}
                   className="flex items-center gap-1"
                 >
                   Orders {sortAsc ? "↑" : "↓"}
@@ -155,7 +148,7 @@ const DashboardPage = () => {
           </TableHeader>
           <TableBody>
             {topCustomers
-              .slice() // avoid mutating original array
+              .slice()
               .sort((a, b) => (sortAsc ? a[1] - b[1] : b[1] - a[1]))
               .map(([id, count]) => (
                 <TableRow key={id}>
@@ -170,14 +163,19 @@ const DashboardPage = () => {
       {/* Top 10 Products Sold - Recharts Bar Chart */}
       <div className="mt-6">
         <h2 className="text-xl font-semibold mb-2">Top 10 Products Sold</h2>
-        {/* Check if chartData is populated */}
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="qty" fill="#4f46e5" />
+              <XAxis dataKey="name" stroke={axisColor} />
+              <YAxis stroke={axisColor} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: isDark ? "#1f2937" : "#fff",
+                  border: `1px solid ${isDark ? "#374151" : "#d1d5db"}`,
+                  color: isDark ? "#f3f4f6" : "#111827",
+                }}
+              />
+              <Bar dataKey="qty" fill={barColor} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
