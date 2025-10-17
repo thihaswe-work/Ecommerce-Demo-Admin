@@ -1,29 +1,32 @@
+"use client";
+
 import { useParams } from "react-router-dom";
 import { useApi } from "@/hooks/useApi";
-import type { Order, OrderItem } from "@/types/type";
+import type { Order, OrderItem, User } from "@/types/type";
 
 const OrderDetailPage = () => {
   const { id } = useParams<{ id: string }>();
 
-  // Use your hook for a single order
-
-  //     const {
-  //     data: order,
-  //     loading,
-  //     error,
-  //     refetch,
-  //   } = useFetchSingle<Order>({
-  //     endpoint: `/orders/${id}`,
-  //   });
-
-  const { data, loading } = useApi<Order>({
+  // Fetch order
+  const { data: orders, loading: loadingOrder } = useApi<Order>({
     endpoint: `/orders/${id}`,
     transform: (res) => (res ? [res] : []),
   });
-  const order = data[0];
+  const order = orders[0];
 
-  if (loading) return <div>Loading...</div>;
+  // Conditionally fetch user only if customerId does not start with "guest"
+  const { data: users, loading: loadingUser } = useApi<User>({
+    endpoint:
+      order && !order.customerId.startsWith("guest")
+        ? `/users/${order.customerId}`
+        : "",
+    transform: (res) => (res ? [res] : []),
+  });
+  const user = users?.[0];
+
+  if (loadingOrder) return <div>Loading order...</div>;
   if (!order) return <div>Order not found</div>;
+
   const statusColors: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800",
     processing: "bg-blue-100 text-blue-800",
@@ -35,9 +38,17 @@ const OrderDetailPage = () => {
   return (
     <div className="p-6 space-y-4">
       <h1 className="text-2xl font-bold">Order #{order.id}</h1>
-      <p>
-        <strong>User ID:</strong> {order.customerId}
-      </p>
+
+      {user ? (
+        <p>
+          <strong>User:</strong> {user.firstName + user.lastName} ({user.email})
+        </p>
+      ) : (
+        <p>
+          <strong>User ID:</strong> {order.customerId} (Guest)
+        </p>
+      )}
+
       <p
         className={`${
           statusColors[order.status]
@@ -45,6 +56,7 @@ const OrderDetailPage = () => {
       >
         <strong>Status:</strong> {order.status}
       </p>
+
       <p>
         <strong>Total:</strong> ${order.total.toFixed(2)}
       </p>
@@ -72,6 +84,8 @@ const OrderDetailPage = () => {
           ))}
         </tbody>
       </table>
+
+      {loadingUser && <p>Loading user info...</p>}
     </div>
   );
 };

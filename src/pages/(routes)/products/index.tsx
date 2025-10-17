@@ -4,18 +4,28 @@ import { ConfirmDialog } from "@/components/ConfirmationDialog";
 import { DataTable } from "@/components/DataTable";
 import { EntityForm } from "@/components/EntityForm";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useApi } from "@/hooks/useApi";
 import type { Product } from "@/types/type";
 import type { ColumnDef } from "@tanstack/react-table";
-import { CopyIcon, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  CopyIcon,
+  ListChevronsDownUp,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function ProductsPage() {
-  const { data, loading, removeItem, createItem, updateItem } = useApi<Product>(
-    { endpoint: "/products" }
-  );
+  const { data, loading, removeItem, createItem, updateItem } = useApi<any>({
+    endpoint: "/products",
+    // transform(data) {
+    //   return data.data;
+    // },
+  });
+  const navigate = useNavigate();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -65,7 +75,11 @@ export default function ProductsPage() {
       accessorKey: "desc",
       header: "Description",
       cell(props) {
-        return <div className="line-clamp-2">{props.row.getValue("desc")}</div>;
+        return (
+          <div className="line-clamp-3 max-w-xl text-wrap">
+            {props.row.getValue("desc")}
+          </div>
+        );
       },
     },
     // {
@@ -115,6 +129,14 @@ export default function ProductsPage() {
               }}
             >
               <CopyIcon className="w-4 h-4" />
+            </Button>{" "}
+            {/* 👁 View Details */}
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => navigate(`/products/${product.id}`)}
+            >
+              <ListChevronsDownUp className="w-4 h-4" />
             </Button>
             <Button
               size="icon"
@@ -158,10 +180,10 @@ export default function ProductsPage() {
         title={editing ? "Edit Product" : "Create Product"}
         fields={[
           { name: "name", label: "Name", required: true },
-          { name: "description", label: "Description", required: true },
-          { name: "price", label: "Price", type: "number", required: true },
+          { name: "desc", label: "Description", required: true },
+          // { name: "price", label: "Price", type: "number", required: true },
           { name: "image", label: "Image" },
-          { name: "stock", label: "Stock", type: "number" },
+          // { name: "stock", label: "Stock", type: "number" },
         ]}
         initialData={editing}
         onClose={() => {

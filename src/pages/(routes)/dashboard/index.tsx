@@ -1,19 +1,189 @@
 import { useAuthStore } from "@/store/authStore";
+import { useApi } from "@/hooks/useApi";
+import type { Order, OrderItem } from "@/types/type";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+// Import Recharts for the Bar Chart
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { stat } from "fs";
+import { useState } from "react";
 
 const DashboardPage = () => {
+  const [sortAsc, setSortAsc] = useState(false);
+
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
 
+  const { data: orders, loading } = useApi<Order>({
+    endpoint: "/orders",
+    transform: (res) => res || [],
+  });
+
+  if (loading) return <div>Loading dashboard...</div>;
+
+  // Status counts
+  const statusOrder = [
+    "pending",
+    "processing",
+    "shipped",
+    "delivered",
+    "cancelled",
+  ];
+  const statusCounts: Record<string, number> = {};
+  orders.forEach((o) => {
+    statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
+  });
+
+  // Top products (sold items count)
+  const productCounts: Record<string, number> = {};
+  orders.forEach((o) => {
+    o.orderItems?.forEach((item: OrderItem) => {
+      productCounts[item.productName] =
+        (productCounts[item.productName] || 0) + item.quantity;
+    });
+  });
+
+  // Get top 10 products by quantity sold
+  const topProducts = Object.entries(productCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
+  // Debugging: log the top products data
+  console.log("Top Products: ", topProducts);
+
+  // Format the data for the chart
+  const chartData = topProducts.map(([name, qty]) => ({
+    name,
+    qty,
+  }));
+
+  // Top customers
+  const customerCounts: Record<string, number> = {};
+  orders.forEach((o) => {
+    const customer = o.customerId;
+    customerCounts[customer] = (customerCounts[customer] || 0) + 1;
+  });
+  const topCustomers = Object.entries(customerCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+
+  const statusColors: Record<string, string> = {
+    pending: "bg-yellow-100 text-yellow-800",
+    processing: "bg-blue-100 text-blue-800",
+    shipped: "bg-purple-100 text-purple-800",
+    delivered: "bg-green-100 text-green-800",
+    cancelled: "bg-red-100 text-red-800",
+  };
+
   return (
-    <div className="w-full bg-amber-500">
-      <h1 className="text-2xl font-bold ">Dashboard</h1>
-      <p>Welcome, {user?.name || "User"}!</p>
+    <div className="p-6 bg-background text-foreground min-h-screen space-y-6">
+      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <p className="text-lg">Welcome, {user?.firstName || "User"}!</p>
       <button
         onClick={logout}
-        className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        className="mt-2 px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
       >
         Logout
       </button>
+
+      {/* Orders by Status */}
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-2">Orders by Status</h2>
+        <Table className="border border-border rounded-md">
+          <TableHeader>
+            <TableRow className="border-b border-border">
+              {statusOrder.map((status) => (
+                <TableHead
+                  key={status}
+                  className={`capitalize font-semibold text-center border-r border-border last:border-r-0 ${
+                    statusColors[status] || ""
+                  }`}
+                >
+                  {status}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow className="border-t border-border">
+              {statusOrder.map((status) => (
+                <TableCell
+                  key={status}
+                  className={`text-center border-r border-border last:border-r-0 bg-muted`}
+                >
+                  {statusCounts[status] || 0}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Top Customers */}
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-2">Top 3 Customers</h2>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Customer ID</TableHead>
+              <TableHead>
+                <button
+                  onClick={() => {
+                    // Toggle sorting between ascending/descending
+                    setSortAsc((prev) => !prev);
+                  }}
+                  className="flex items-center gap-1"
+                >
+                  Orders {sortAsc ? "↑" : "↓"}
+                </button>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {topCustomers
+              .slice() // avoid mutating original array
+              .sort((a, b) => (sortAsc ? a[1] - b[1] : b[1] - a[1]))
+              .map(([id, count]) => (
+                <TableRow key={id}>
+                  <TableCell>{id}</TableCell>
+                  <TableCell>{count}</TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Top 10 Products Sold - Recharts Bar Chart */}
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-2">Top 10 Products Sold</h2>
+        {/* Check if chartData is populated */}
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="qty" fill="#4f46e5" />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <p>No data available for top products.</p>
+        )}
+      </div>
     </div>
   );
 };

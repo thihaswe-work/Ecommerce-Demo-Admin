@@ -16,27 +16,33 @@ export const useApi = <T>({
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const { setError } = useError(); // use global error
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiClient.get(endpoint, { params: fetchParams });
 
-      setData(transform ? transform(res.data) : res.data);
-    } catch (err: any) {
-      setError({
-        status: err.response?.status || 500,
-        message: err.response?.data?.message || "Something went wrong",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [endpoint, fetchParams]);
+  const fetchData = useCallback(
+    async (params?: any) => {
+      // allow optional override
+      setLoading(true);
+      try {
+        const res = await apiClient.get(endpoint, {
+          params: params || fetchParams, // override if provided
+        });
+        setData(transform ? transform(res.data) : res.data);
+      } catch (err: any) {
+        setError({
+          status: err.response?.status || 500,
+          message: err.response?.data?.message || "Something went wrong",
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [endpoint, fetchParams]
+  );
 
   const removeItem = useCallback(
-    async (id: string | number) => {
+    async (id: string | number, newendpoint?: string) => {
       // if (!confirm("Are you sure?")) return;
       try {
-        await apiClient.delete(`${endpoint}/${id}`);
+        await apiClient.delete(`${newendpoint ?? endpoint}/${id}`);
         setData((prev) => prev.filter((item: any) => item.id !== id));
       } catch (err: any) {
         setError({
@@ -65,9 +71,12 @@ export const useApi = <T>({
   );
 
   const updateItem = useCallback(
-    async (id: string | number, payload: Partial<T>) => {
+    async (id: string | number, payload: Partial<T>, newendpoint?: string) => {
       try {
-        const res = await apiClient.put(`${endpoint}/${id}`, payload);
+        const res = await apiClient.put(
+          `${newendpoint ?? endpoint}/${id}`,
+          payload
+        );
         setData((prev) =>
           prev.map((item: any) => (item.id === id ? res.data : item))
         );

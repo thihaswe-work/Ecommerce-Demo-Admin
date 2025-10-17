@@ -9,6 +9,9 @@ import AuthLayout from "./layouts/AuthLayout";
 import PublicLayout from "./layouts/PublicLayout";
 import RegisterPage from "./pages/(auth)/register.tsx";
 import ResetPasswordPage from "./pages/(auth)/reset-password";
+import ProductDetailPage from "./pages/(routes)/products/productDetail.tsx";
+import UserDetailPage from "./pages/(routes)/users/userDetail.tsx";
+import SettingPage from "./pages/(routes)/settings/index.tsx";
 
 // ✅ Lazy imports
 const LoginPage = lazy(() => import("./pages/(auth)/login"));
@@ -70,9 +73,12 @@ function App() {
             >
               <Route path="" element={<DashboardPage />} />
               <Route path="products" element={<ProductsPage />} />
+              <Route path="products/:id" element={<ProductDetailPage />} />
               <Route path="users" element={<UsersPage />} />
+              <Route path="users/:id" element={<UserDetailPage />} />
               <Route path="orders" element={<OrdersPage />} />
               <Route path="orders/:id" element={<OrderDetailPage />} />
+              <Route path="settings" element={<SettingPage />} />
             </Route>
           </Route>
 

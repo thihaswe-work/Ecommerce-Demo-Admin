@@ -61,7 +61,6 @@ export interface Product {
   image: string;
   desc: string;
   inventory?: Inventory;
-  price: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,6 +72,35 @@ export interface User {
   email: string;
   avatar?: string;
   role: Role;
+  createdAt: Date;
+  updatedAt: Date;
+  paymentMethod?: PaymentMethod[];
+  address?: Address[];
+}
+export interface PaymentMethod {
+  id: number;
+  type: "card";
+  cardName: string;
+  number: string;
+  numberLast4?: string;
+  holderName?: string;
+  userId: string;
+  expiryMonth?: number;
+  expiryYear?: number;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Address {
+  id: number;
+  addressName: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
