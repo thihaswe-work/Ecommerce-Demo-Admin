@@ -2,15 +2,20 @@ import { ConfirmDialog } from "@/components/ConfirmationDialog";
 import { DataTable } from "@/components/DataTable";
 import { EntityForm } from "@/components/EntityForm";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useApi } from "@/hooks/useApi";
-import type { User } from "@/types/type";
+import type { Role, User } from "@/types/type";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowUpDown,
+  ChevronDown,
   CopyIcon,
   ListChevronsDownUp,
-  Pencil,
-  Plus,
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
@@ -67,6 +72,64 @@ export default function UsersPage() {
             N/A
           </div>
         ),
+    },
+    {
+      id: "role",
+      header: "Role",
+      cell: ({ row }) => {
+        const user = row.original as User;
+        const roles: Role[] = ["admin", "user"];
+        const roleColors: Record<string, string> = {
+          Admin: "bg-green-100 text-green-800",
+          User: "bg-blue-100 text-blue-800",
+        };
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              {user.email === "admin@passiongeek.com" ? (
+                <div>
+                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`flex items-center gap-1 ${roleColors[user.role]}`}
+                >
+                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                  <ChevronDown className="w-3 h-3" />
+                </Button>
+              )}
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+              {roles.map((role) => (
+                <DropdownMenuItem
+                  key={role}
+                  className="cursor-pointer text-center w-full"
+                  onClick={async () => {
+                    try {
+                      if (user.role !== role) {
+                        await updateItem(user.id, { role });
+                        toast.success(`User role changed to ${role}`);
+                      }
+                    } catch {
+                      toast.error("Failed to update role");
+                    }
+                  }}
+                >
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${roleColors[role]}`}
+                  >
+                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
     {
       id: "actions",

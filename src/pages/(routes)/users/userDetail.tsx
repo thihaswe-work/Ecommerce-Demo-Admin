@@ -1,15 +1,21 @@
-"use client";
-
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useApi } from "@/hooks/useApi";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ConfirmationDialog";
-import type { User, PaymentMethod, Address } from "@/types/type";
+import type { User, PaymentMethod, Address, Role } from "@/types/type";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { ChevronDown } from "lucide-react";
 
 export default function UserDetailPage() {
   const { id: userId } = useParams();
-  const { data, removeItem, loading } = useApi<User>({
+  const { data, removeItem, loading, updateItem } = useApi<User>({
     endpoint: `/users/${userId}`,
     transform: (res: any) => [res],
   });
@@ -19,8 +25,9 @@ export default function UserDetailPage() {
   const [dialogType, setDialogType] = useState<
     "user" | "address" | "payment" | null
   >(null);
+  const [updatingRole, setUpdatingRole] = useState(false);
   const [targetId, setTargetId] = useState<number | string | null>(null);
-
+  const roles = ["admin", "user", "merchant"];
   if (!user)
     return <p className="text-gray-500 dark:text-gray-400">Loading user...</p>;
 
@@ -46,6 +53,19 @@ export default function UserDetailPage() {
     setDialogType(null);
     if (dialogType === "user") navigate("/users");
   };
+  const handleRoleChange = async (value: string) => {
+    if (!user) return;
+    const newRole = value as Role;
+    try {
+      setUpdatingRole(true);
+      await updateItem(user.id, { role: newRole });
+      toast(`User role updated to ${newRole}`);
+    } catch (err) {
+      toast("Failed to update role");
+    } finally {
+      setUpdatingRole(false);
+    }
+  };
 
   return (
     <div className="p-6 rounded shadow-md space-y-6 text-gray-900 dark:text-gray-100">
@@ -55,7 +75,39 @@ export default function UserDetailPage() {
           {user.firstName} {user.lastName}
         </h2>
         <p>Email: {user.email}</p>
-        <p>Role: {user.role}</p>
+
+        {/* Role Dropdown */}
+        <div className="flex items-center gap-2">
+          <p>Role:</p>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                disabled={updatingRole}
+                className="flex items-center gap-1"
+              >
+                {user.role.charAt(0).toUpperCase() +
+                  user.role.slice(1).toLowerCase()}
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="start">
+              {roles.map((role) => (
+                <DropdownMenuItem
+                  key={role}
+                  onClick={() => handleRoleChange(role)}
+                  className="cursor-pointer"
+                >
+                  {role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {updatingRole && (
+            <span className="text-sm text-gray-500">Updating...</span>
+          )}
+        </div>
       </div>
 
       {/* Addresses */}
