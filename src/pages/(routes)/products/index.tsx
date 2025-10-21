@@ -1,5 +1,11 @@
 "use client";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { ConfirmDialog } from "@/components/ConfirmationDialog";
 import { DataTable } from "@/components/DataTable";
 import { EntityForm } from "@/components/EntityForm";
@@ -17,6 +23,7 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { stat } from "fs";
 
 export default function ProductsPage() {
   const { data, loading, removeItem, createItem, updateItem } = useApi<any>({
@@ -99,7 +106,17 @@ export default function ProductsPage() {
     // },
     {
       accessorKey: "inventory.price", // points to nested inventory price
-      header: "Price",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Price
+            <ArrowUpDown />
+          </Button>
+        );
+      },
       cell: ({ row }) => {
         const inventory = row.original.inventory;
         const price = inventory?.price ?? 0; // fallback if inventory is undefined
@@ -110,6 +127,73 @@ export default function ProductsPage() {
               currency: "USD",
             }).format(price)}
           </div>
+        );
+      },
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const product = row.original;
+        const status = product.status; // boolean
+        const statusColor = status
+          ? "bg-green-100 text-green-800"
+          : "bg-red-100 text-red-800";
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={`flex items-center gap-1 ${statusColor}`}
+              >
+                <span className="px-2 py-1 rounded text-xs font-medium">
+                  {status ? "Active" : "Inactive"}
+                </span>
+                <ChevronDown className="w-3 h-3" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            {/* Match width of trigger button */}
+            <DropdownMenuContent align="start" className="w-full min-w-[120px]">
+              {[true, false].map((s) => (
+                <DropdownMenuItem
+                  key={String(s)}
+                  className="w-full flex justify-center"
+                  onClick={async () => {
+                    if (status !== s) {
+                      await updateItem(product.id, { status: s });
+                      toast(
+                        <span>
+                          Product has been{" "}
+                          <span
+                            className={
+                              s
+                                ? "text-green-600 font-semibold"
+                                : "text-red-600 font-semibold"
+                            }
+                          >
+                            {s ? "Activated" : "Deactivated"}
+                          </span>
+                        </span>
+                      );
+                    }
+                  }}
+                >
+                  <div
+                    className={`w-full text-center px-2 py-1 rounded text-xs font-medium ${
+                      s
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {s ? "Active" : "Inactive"}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         );
       },
     },

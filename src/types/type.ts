@@ -60,6 +60,7 @@ export interface Product {
   name: string;
   image: string;
   desc: string;
+  status: boolean;
   inventory?: Inventory;
   createdAt: Date;
   updatedAt: Date;

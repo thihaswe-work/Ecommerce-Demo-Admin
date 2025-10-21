@@ -6,6 +6,7 @@ import { useApi } from "@/hooks/useApi";
 import type { User } from "@/types/type";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
+  ArrowUpDown,
   CopyIcon,
   ListChevronsDownUp,
   Pencil,
@@ -37,7 +38,20 @@ export default function UsersPage() {
         );
       },
     },
-    { accessorKey: "email", header: "Email" },
+    {
+      accessorKey: "email",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Email
+            <ArrowUpDown />
+          </Button>
+        );
+      },
+    },
     {
       accessorKey: "avatar",
       header: "Avatar",
@@ -86,7 +100,14 @@ export default function UsersPage() {
               <Button
                 size="icon"
                 variant="destructive"
-                onClick={() => setDeleteTarget(user)}
+                onClick={() => {
+                  setDeleteTarget(user);
+                  toast(
+                    `User ${
+                      (user.firstName, " ", user.lastName)
+                    } has been deleted`
+                  );
+                }}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>

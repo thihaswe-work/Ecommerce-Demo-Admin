@@ -98,6 +98,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import type { Order } from "@/types/type";
+import { stat } from "fs";
 
 export default function OrdersPage() {
   const { data, loading, removeItem, createItem, updateItem } = useApi<Order>({
@@ -174,8 +175,24 @@ export default function OrdersPage() {
                 <DropdownMenuItem
                   key={status}
                   onClick={async () => {
-                    // TODO: call your API to update status
-                    await updateItem(order.id, { status });
+                    // TODO: call your API to update statusconst
+                    const colorClass =
+                      statusColors[status] || "bg-gray-100 text-gray-800";
+                    if (order.status !== status) {
+                      await updateItem(order.id, { status });
+                      toast(
+                        <span>
+                          Order Status Changed to{" "}
+                          <span
+                            className={`${colorClass
+                              .replace("bg-", "")
+                              .replace("text-", "text-")}`}
+                          >
+                            {status}
+                          </span>
+                        </span>
+                      );
+                    }
                   }}
                 >
                   <span

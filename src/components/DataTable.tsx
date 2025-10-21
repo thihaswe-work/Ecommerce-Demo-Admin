@@ -59,7 +59,13 @@ export function DataTable<T>({ data, columns }: DataTableProps<T>) {
       {
         id: "number",
         header: "No",
-        cell: ({ row }) => row.index + 1,
+        cell: ({ row, table }) => {
+          // Find the index of this row in the current sorted/filtered rows
+          const index = table
+            .getRowModel()
+            .rows.findIndex((r) => r.id === row.id);
+          return index + 1;
+        },
       },
       ...columns,
     ],
