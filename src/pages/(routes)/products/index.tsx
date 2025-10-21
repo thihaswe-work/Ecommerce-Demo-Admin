@@ -60,7 +60,17 @@ export default function ProductsPage() {
     //   ),
     // },
 
-    { accessorKey: "name", header: "Name" },
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell(props) {
+        return (
+          <div className="line-clamp-3 max-w-sm text-wrap">
+            {props.row.getValue("name")}
+          </div>
+        );
+      },
+    },
     {
       accessorKey: "image",
       header: "Image",
