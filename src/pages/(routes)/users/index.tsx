@@ -1,5 +1,3 @@
-"use client";
-
 import { ConfirmDialog } from "@/components/ConfirmationDialog";
 import { DataTable } from "@/components/DataTable";
 import { EntityForm } from "@/components/EntityForm";
@@ -56,11 +54,11 @@ export default function UsersPage() {
           </div>
         ),
     },
-
     {
       id: "actions",
       cell: ({ row }) => {
-        const user = row.original;
+        const user = row.original as User;
+
         return (
           <div className="flex gap-2 justify-end">
             <Button
@@ -68,11 +66,12 @@ export default function UsersPage() {
               variant="outline"
               onClick={() => {
                 navigator.clipboard.writeText(user.email);
-                toast.success("UserEmail copied to clipboard");
+                toast.success("User email copied to clipboard");
               }}
             >
               <CopyIcon className="w-4 h-4" />
             </Button>
+
             {/* 👁 View Details */}
             <Button
               size="icon"
@@ -81,13 +80,17 @@ export default function UsersPage() {
             >
               <ListChevronsDownUp className="w-4 h-4" />
             </Button>
-            <Button
-              size="icon"
-              variant="destructive"
-              onClick={() => setDeleteTarget(user)}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+
+            {/* 🗑️ Delete — only show if NOT admin */}
+            {user.role !== "admin" && (
+              <Button
+                size="icon"
+                variant="destructive"
+                onClick={() => setDeleteTarget(user)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         );
       },

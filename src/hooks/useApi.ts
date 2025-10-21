@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { apiClient } from "@/api/client";
 import { useError } from "@/context/errorContext";
+import { useAuthStore } from "@/store/authStore";
 
 interface UseApiOptions<T> {
   endpoint: string; // API path, e.g., '/users'
@@ -16,6 +17,8 @@ export const useApi = <T>({
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const { setError } = useError(); // use global error
+
+  const { user, setUser } = useAuthStore();
 
   const fetchData = useCallback(
     async (params?: any) => {
@@ -91,6 +94,22 @@ export const useApi = <T>({
     [endpoint]
   );
 
+  const updateProfile = useCallback(
+    async (payload: Partial<T>, newendpoint?: string) => {
+      try {
+        const res = await apiClient.put(`${newendpoint ?? endpoint}`, payload);
+        setUser(res.data);
+        return res.data;
+      } catch (err: any) {
+        setError({
+          status: err.response?.status || 500,
+          message: err.response?.data?.message || "Something went wrong",
+        });
+      }
+    },
+    [endpoint]
+  );
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -98,6 +117,7 @@ export const useApi = <T>({
   return {
     data,
     loading,
+    updateProfile,
     fetchData,
     removeItem,
     createItem,

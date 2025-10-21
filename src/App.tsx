@@ -12,6 +12,7 @@ import ResetPasswordPage from "./pages/(auth)/reset-password";
 import ProductDetailPage from "./pages/(routes)/products/productDetail.tsx";
 import UserDetailPage from "./pages/(routes)/users/userDetail.tsx";
 import SettingPage from "./pages/(routes)/settings/index.tsx";
+import ProfilePage from "./pages/(routes)/profile/index.tsx";
 
 // ✅ Lazy imports
 const LoginPage = lazy(() => import("./pages/(auth)/login"));
@@ -79,6 +80,7 @@ function App() {
               <Route path="orders" element={<OrdersPage />} />
               <Route path="orders/:id" element={<OrderDetailPage />} />
               <Route path="settings" element={<SettingPage />} />
+              <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Route>
 

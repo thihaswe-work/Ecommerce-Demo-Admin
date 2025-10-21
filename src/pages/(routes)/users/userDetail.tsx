@@ -5,7 +5,7 @@ import { useApi } from "@/hooks/useApi";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ConfirmationDialog";
 import type { User, PaymentMethod, Address } from "@/types/type";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function UserDetailPage() {
   const { id: userId } = useParams();
@@ -14,7 +14,7 @@ export default function UserDetailPage() {
     transform: (res: any) => [res],
   });
   const user = data.find((u) => u.id === userId);
-
+  const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<
     "user" | "address" | "payment" | null
@@ -36,7 +36,7 @@ export default function UserDetailPage() {
   const handleConfirmDelete = async () => {
     if (targetId == null || !dialogType) return;
 
-    if (dialogType === "user") await removeItem(user.id);
+    if (dialogType === "user") await removeItem(user.id, "/users");
     if (dialogType === "address") await removeItem(targetId, "/addresses");
     if (dialogType === "payment")
       await removeItem(targetId, "/payment-methods");
@@ -44,6 +44,7 @@ export default function UserDetailPage() {
     setDialogOpen(false);
     setTargetId(null);
     setDialogType(null);
+    if (dialogType === "user") navigate("/users");
   };
 
   return (
