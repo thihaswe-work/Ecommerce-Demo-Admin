@@ -1,11 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { User, LogOut, Menu, Moon, Sun } from "lucide-react"; // Menu icon optional
 import { SidebarTrigger } from "@/components/ui/sidebar"; // import SidebarTrigger
-import { useStore } from "zustand";
 import { useAuthStore } from "@/store/authStore";
 import { useThemeStore } from "@/store/themeStore";
+import { motion } from "framer-motion";
+import { LogOut, Menu, Moon, Sun, User } from "lucide-react"; // Menu icon optional
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -21,7 +20,7 @@ export default function Navbar() {
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className=" bg-white dark:bg-muted shadow-md px-6 py-4 flex justify-between items-center"
+      className=" bg-white dark:bg-muted shadow-md px-6 py-4 flex justify-between items-center z-10"
     >
       <div className="flex items-center gap-4">
         {/* Sidebar Trigger Button */}

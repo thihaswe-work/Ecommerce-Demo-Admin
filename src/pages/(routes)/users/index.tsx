@@ -103,30 +103,32 @@ export default function UsersPage() {
               )}
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end">
-              {roles.map((role) => (
-                <DropdownMenuItem
-                  key={role}
-                  className="cursor-pointer text-center w-full"
-                  onClick={async () => {
-                    try {
-                      if (user.role !== role) {
-                        await updateItem(user.id, { role });
-                        toast.success(`User role changed to ${role}`);
+            {user.email !== "admin@passiongeek.com" && (
+              <DropdownMenuContent align="end">
+                {roles.map((role) => (
+                  <DropdownMenuItem
+                    key={role}
+                    className="cursor-pointer text-center w-full"
+                    onClick={async () => {
+                      try {
+                        if (user.role !== role) {
+                          await updateItem(user.id, { role });
+                          toast.success(`User role changed to ${role}`);
+                        }
+                      } catch {
+                        toast.error("Failed to update role");
                       }
-                    } catch {
-                      toast.error("Failed to update role");
-                    }
-                  }}
-                >
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium ${roleColors[role]}`}
+                    }}
                   >
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
-                  </span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${roleColors[role]}`}
+                    >
+                      {role.charAt(0).toUpperCase() + role.slice(1)}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            )}
           </DropdownMenu>
         );
       },

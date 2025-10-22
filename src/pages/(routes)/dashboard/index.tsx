@@ -89,12 +89,13 @@ const DashboardPage = () => {
     <div className="p-6 bg-background text-foreground min-h-screen space-y-6">
       <h1 className="text-3xl font-bold">Dashboard</h1>
       <p className="text-lg">Welcome, {user?.firstName || "User"}!</p>
-      <button
-        onClick={logout}
-        className="mt-2 px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
-      >
-        Logout
-      </button>
+      <img
+        src={user?.avatar}
+        alt="user image"
+        width={100}
+        height={100}
+        className="rounded-full object-cover"
+      />
 
       {/* Orders by Status */}
       <div className="mt-6">
