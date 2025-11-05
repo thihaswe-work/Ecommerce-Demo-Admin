@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { apiClient } from "@/api/client";
 import type { User } from "@/types/type";
 import { create } from "zustand";

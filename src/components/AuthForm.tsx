@@ -203,12 +203,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit }) => {
         {/* Footer links */}
         {mode === "login" && (
           <p className="text-center text-muted-foreground text-sm mt-4 space-x-2">
-            <span
+            {/* <span
               className="text-primary cursor-pointer hover:underline"
               onClick={() => navigate("/register")}
             >
               Sign Up
-            </span>
+            </span> */}
             |
             <span
               className="text-primary cursor-pointer hover:underline"

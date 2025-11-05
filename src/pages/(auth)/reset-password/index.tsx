@@ -1,7 +1,6 @@
 // ResetPage.tsx
-import React from "react";
-import { useAuthStore } from "@/store/authStore";
 import AuthForm from "@/components/AuthForm";
+import { useAuthStore } from "@/store/authStore";
 
 const ResetPasswordPage = () => {
   const reset = useAuthStore((state) => state.resetPassword);

@@ -1,6 +1,3 @@
-import { useAuthStore } from "@/store/authStore";
-import { useApi } from "@/hooks/useApi";
-import type { Order, OrderItem } from "@/types/type";
 import {
   Table,
   TableBody,
@@ -9,23 +6,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useApi } from "@/hooks/useApi";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
+import type { Order, OrderItem } from "@/types/type";
+import { useState } from "react";
 import {
-  BarChart,
   Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
-import { useEffect, useState } from "react";
-import { useThemeStore } from "@/store/themeStore";
 
 const DashboardPage = () => {
   const [sortAsc, setSortAsc] = useState(false);
   const { theme } = useThemeStore(); // get current theme
   const isDark = theme === "dark";
 
-  const logout = useAuthStore((state) => state.logout);
+  // const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
 
   const { data: orders, loading } = useApi<Order>({

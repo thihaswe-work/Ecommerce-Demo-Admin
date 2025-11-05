@@ -84,24 +84,27 @@
 import { ConfirmDialog } from "@/components/ConfirmationDialog";
 import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
-import { useApi } from "@/hooks/useApi";
-import type { ColumnDef } from "@tanstack/react-table";
-import { CopyIcon, ListChevronsDownUp, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
-import { toast } from "sonner";
+import { useApi } from "@/hooks/useApi";
 import type { Order } from "@/types/type";
-import { stat } from "fs";
+import type { ColumnDef } from "@tanstack/react-table";
+import {
+  ChevronDown,
+  CopyIcon,
+  ListChevronsDownUp,
+  Trash2,
+} from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function OrdersPage() {
-  const { data, loading, removeItem, createItem, updateItem } = useApi<Order>({
+  const { data, loading, removeItem, updateItem } = useApi<Order>({
     endpoint: "/orders",
   });
   const navigate = useNavigate();

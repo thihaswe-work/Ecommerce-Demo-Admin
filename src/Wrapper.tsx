@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
-import App from "./App";
+import { useEffect } from "react";
 import { Toaster } from "sonner";
-import { useThemeStore } from "./store/themeStore";
+import App from "./App";
 import { ErrorProvider } from "./context/errorContext";
+import { useThemeStore } from "./store/themeStore";
 
 const Wrapper = () => {
   const setTheme = useThemeStore((state) => state.setTheme);

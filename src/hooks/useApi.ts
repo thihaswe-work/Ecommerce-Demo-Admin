@@ -17,7 +17,7 @@ export const useApi = <T>({
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const { setError } = useError(); // use global error
-  const { user, setUser } = useAuthStore();
+  const { setUser } = useAuthStore();
 
   const fetchData = useCallback(
     async (params?: any) => {

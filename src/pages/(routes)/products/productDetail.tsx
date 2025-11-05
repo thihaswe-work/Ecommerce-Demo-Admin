@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useApi } from "@/hooks/useApi";
 import { Button } from "@/components/ui/button";
-import type { Product, Inventory } from "@/types/type";
+import { useApi } from "@/hooks/useApi";
+import type { Product } from "@/types/type";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const ProductDetailPage = () => {
