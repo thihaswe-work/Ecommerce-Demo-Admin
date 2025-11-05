@@ -105,5 +105,8 @@ export interface Address {
   createdAt: Date;
   updatedAt: Date;
 }
-
+export interface Setting {
+  id: number;
+  underMaintenance: boolean;
+}
 export type Role = "user" | "admin" | "merchant";

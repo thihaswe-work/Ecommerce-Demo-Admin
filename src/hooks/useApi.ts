@@ -17,7 +17,6 @@ export const useApi = <T>({
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const { setError } = useError(); // use global error
-
   const { user, setUser } = useAuthStore();
 
   const fetchData = useCallback(
@@ -74,10 +73,14 @@ export const useApi = <T>({
   );
 
   const updateItem = useCallback(
-    async (id: string | number, payload: Partial<T>, newendpoint?: string) => {
+    async (
+      id: string | number | undefined,
+      payload: Partial<T>,
+      newendpoint?: string
+    ) => {
       try {
         const res = await apiClient.put(
-          `${newendpoint ?? endpoint}/${id}`,
+          `${newendpoint ?? endpoint}/${id ? id : ""}`,
           payload
         );
         setData((prev) =>
