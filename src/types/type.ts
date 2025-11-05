@@ -55,6 +55,15 @@ export interface Inventory {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Category {
+  id: number;
+  name: string;
+  image: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -62,6 +71,7 @@ export interface Product {
   desc: string;
   status: boolean;
   inventory?: Inventory;
+  category?: Category;
   createdAt: Date;
   updatedAt: Date;
 }

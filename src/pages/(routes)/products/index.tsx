@@ -1,18 +1,15 @@
 "use client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ArrowUpDown, ChevronDown } from "lucide-react";
+
+import { ArrowUpDown } from "lucide-react";
 import { ConfirmDialog } from "@/components/ConfirmationDialog";
 import { DataTable } from "@/components/DataTable";
 import { EntityForm } from "@/components/EntityForm";
-import { Button } from "@/components/ui/button";
 import { useApi } from "@/hooks/useApi";
 import type { Product } from "@/types/type";
 import type { ColumnDef } from "@tanstack/react-table";
+
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
 import {
   CopyIcon,
   ListChevronsDownUp,
@@ -23,15 +20,27 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { stat } from "fs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function ProductsPage() {
+  const { data: categories, loading: categoryLoading } = useApi<any>({
+    endpoint: "/categories",
+    // transform(data) {
+    //   return data.data;
+    // },
+  });
   const { data, loading, removeItem, createItem, updateItem } = useApi<any>({
     endpoint: "/products",
     // transform(data) {
     //   return data.data;
     // },
   });
+
   const navigate = useNavigate();
 
   const [formOpen, setFormOpen] = useState(false);
@@ -255,7 +264,7 @@ export default function ProductsPage() {
     },
   ];
 
-  if (loading) return <p>Loading...</p>;
+  if (loading && categoryLoading) return <p>Loading...</p>;
 
   return (
     <div className="p-6">
@@ -278,6 +287,16 @@ export default function ProductsPage() {
           // { name: "price", label: "Price", type: "number", required: true },
           { name: "image", label: "Image" },
           // { name: "stock", label: "Stock", type: "number" },
+          {
+            name: "categoryId",
+            label: "Category",
+            required: true,
+            // Enable dropdown for this field
+            dropdown: categories.map((cat) => ({
+              id: cat.id,
+              name: cat.name,
+            })),
+          },
         ]}
         initialData={editing}
         onClose={() => {
@@ -288,7 +307,8 @@ export default function ProductsPage() {
           if (editing) {
             await updateItem(editing.id, values);
           } else {
-            await createItem(values);
+            const data = await createItem(values);
+            navigate(`/products/${data.id}`);
           }
           setFormOpen(false);
           setEditing(null);
