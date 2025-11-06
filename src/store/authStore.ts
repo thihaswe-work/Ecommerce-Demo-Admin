@@ -68,8 +68,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         password,
         confirmPassword,
       });
-      console.log(res.data.user); // user info
-      console.log("cookie", document.cookie);
       set({ user: res.data.user });
       localStorage.setItem("user", JSON.stringify(res.data.user));
     } catch (err: any) {
